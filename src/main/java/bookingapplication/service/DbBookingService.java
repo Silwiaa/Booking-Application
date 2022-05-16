@@ -1,6 +1,7 @@
 package bookingapplication.service;
 
 import bookingapplication.domain.Booking;
+import bookingapplication.exception.BookingNotFoundException;
 import bookingapplication.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,8 @@ public class DbBookingService {
         return bookingRepository.save(booking);
     }
 
-    public Booking findBookingById(Long bookingId) throws Exception {
-        return bookingRepository.findById(bookingId).orElseThrow(Exception::new);
+    public Booking findBookingById(Long bookingId) throws BookingNotFoundException {
+        return bookingRepository.findById(bookingId).orElseThrow(BookingNotFoundException::new);
     }
 
     public Booking updateBooking(Long bookingId, LocalDate fromDate, LocalDate toDate) throws Exception {

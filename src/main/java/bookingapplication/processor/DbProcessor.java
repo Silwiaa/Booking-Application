@@ -17,7 +17,6 @@ public class DbProcessor {
         dbManagerService.createClearTableQuery(Table.FACILITIES.getResource());
         dbManagerService.createClearTableQuery(Table.OWNERS.getResource());
         dbManagerService.createClearTableQuery(Table.CUSTOMERS.getResource());
-
     }
 
     public static void process() throws SQLException {

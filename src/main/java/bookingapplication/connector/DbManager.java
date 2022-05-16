@@ -22,9 +22,6 @@ public enum DbManager {
             throw new ExceptionInInitializerError(e);
         }
     }
-    public static DbManager getInstance() {
-        return INSTANCE;
-    }
 
     public Connection getConnection() {
         return connection;

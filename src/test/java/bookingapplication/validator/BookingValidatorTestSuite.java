@@ -4,6 +4,10 @@ import bookingapplication.domain.Booking;
 import bookingapplication.domain.Customer;
 import bookingapplication.domain.Facility;
 import bookingapplication.domain.Owner;
+import bookingapplication.exception.BookingInThePastException;
+import bookingapplication.exception.FromDateEqualsToDateException;
+import bookingapplication.exception.OverlapsWithAnotherBookingException;
+import bookingapplication.exception.ToDateBeforeFromDateException;
 import bookingapplication.service.DbBookingService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,9 +20,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -77,62 +80,13 @@ public class BookingValidatorTestSuite {
     }
 
     @Test
-    void shouldReturnFalseIfBookingNoOverlaps() {
-        //Given
-        LocalDate fromDate = LocalDate.of(2022, 6, 16);
-        LocalDate toDate = LocalDate.of(2022, 6, 17);
-
-        //When
-        boolean result = bookingValidator.bookingOverlaps(booking, fromDate, toDate);
-
-        //Then
-        assertFalse(result);
-    }
-
-    @Test
-    void shouldReturnTrueIfBookingOverlaps() {
-        //Given
-        LocalDate fromDate = LocalDate.of(2022, 6, 10);
-        LocalDate toDate = LocalDate.of(2022, 6, 12);
-
-        LocalDate fromDate2 = LocalDate.of(2022, 6, 12);
-        LocalDate toDate2 = LocalDate.of(2022, 6, 13);
-
-        LocalDate fromDate3 = LocalDate.of(2022, 6, 13);
-        LocalDate toDate3 = LocalDate.of(2022, 6, 17);
-
-        LocalDate fromDate4 = LocalDate.of(2022, 6, 10);
-        LocalDate toDate4 = LocalDate.of(2022, 6, 17);
-
-        //When
-        boolean result = bookingValidator.bookingOverlaps(booking, fromDate, toDate);
-        boolean result2 = bookingValidator.bookingOverlaps(booking, fromDate2, toDate2);
-        boolean result3 = bookingValidator.bookingOverlaps(booking, fromDate3, toDate3);
-        boolean result4 = bookingValidator.bookingOverlaps(booking, fromDate4, toDate4);
-
-        //Then
-        assertTrue(result);
-        assertTrue(result2);
-        assertTrue(result3);
-        assertTrue(result4);
-    }
-
-    @Test
     void shouldThrowExceptionIfFromDateInThePast() {
         //Given
         LocalDate fromDate = LocalDate.of(2021, 6, 10);
         LocalDate toDate = LocalDate.of(2021, 6, 12);
 
-        //When
-        String errMesage = "";
-        try {
-            bookingValidator.validateBookingDates(fromDate, toDate);
-        } catch (Exception e) {
-            errMesage = e.getMessage();
-        }
-
-        //Then
-        assertEquals(errMesage, null);
+        //When & Then
+        assertThrows(BookingInThePastException.class, () -> bookingValidator.validateBookingDates(fromDate, toDate));
     }
 
     @Test
@@ -141,16 +95,8 @@ public class BookingValidatorTestSuite {
         LocalDate fromDate = LocalDate.of(2022, 12, 10);
         LocalDate toDate = LocalDate.of(2022, 12, 9);
 
-        //When
-        String errMesage = "";
-        try {
-            bookingValidator.validateBookingDates(fromDate, toDate);
-        } catch (Exception e) {
-            errMesage = e.getMessage();
-        }
-
-        //Then
-        assertEquals(errMesage, null);
+        //When & Then
+        assertThrows(ToDateBeforeFromDateException.class, () -> bookingValidator.validateBookingDates(fromDate, toDate));
     }
 
     @Test
@@ -159,15 +105,47 @@ public class BookingValidatorTestSuite {
         LocalDate fromDate = LocalDate.of(2022, 12, 10);
         LocalDate toDate = LocalDate.of(2022, 12, 10);
 
-        //When
-        String errMesage = "";
-        try {
-            bookingValidator.validateBookingDates(fromDate, toDate);
-        } catch (Exception e) {
-            errMesage = e.getMessage();
-        }
+        //When & Then
+        assertThrows(FromDateEqualsToDateException.class, () -> bookingValidator.validateBookingDates(fromDate, toDate));
+    }
 
-        //Then
-        assertEquals(errMesage, null);
+    @Test
+    void shouldReturnFalseIfBookingOverlapsCase1() {
+        //Given
+        LocalDate fromDate = LocalDate.of(2022, 6, 10);
+        LocalDate toDate = LocalDate.of(2022, 6, 12);
+
+        //When & Then
+        assertThrows(OverlapsWithAnotherBookingException.class, () -> bookingValidator.bookingOverlaps(booking, fromDate, toDate));
+    }
+
+    @Test
+    void shouldReturnFalseIfBookingOverlapsCase2() {
+        //Given
+        LocalDate fromDate = LocalDate.of(2022, 6, 12);
+        LocalDate toDate = LocalDate.of(2022, 6, 13);
+
+        //When & Then
+        assertThrows(OverlapsWithAnotherBookingException.class, () -> bookingValidator.bookingOverlaps(booking, fromDate, toDate));
+    }
+
+    @Test
+    void shouldReturnFalseIfBookingOverlapsCase3() {
+        //Given
+        LocalDate fromDate = LocalDate.of(2022, 6, 13);
+        LocalDate toDate = LocalDate.of(2022, 6, 17);
+
+        //When & Then
+        assertThrows(OverlapsWithAnotherBookingException.class, () -> bookingValidator.bookingOverlaps(booking, fromDate, toDate));
+    }
+
+    @Test
+    void shouldReturnFalseIfBookingOverlapsCase4() {
+        //Given
+        LocalDate fromDate = LocalDate.of(2022, 6, 10);
+        LocalDate toDate = LocalDate.of(2022, 6, 17);
+
+        //When & Then
+        assertThrows(OverlapsWithAnotherBookingException.class, () -> bookingValidator.bookingOverlaps(booking, fromDate, toDate));
     }
 }

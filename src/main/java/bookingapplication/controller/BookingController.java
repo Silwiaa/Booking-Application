@@ -41,7 +41,7 @@ public class BookingController {
     }
 
     @GetMapping("/getCustomerBookings")
-    public ResponseEntity<List<BookingDto>> getCustomerBookings(@RequestParam String customerName) throws Exception {
+    public ResponseEntity<List<BookingDto>> getCustomerBookings(@RequestParam String customerName) {
         return ResponseEntity.ok(bookingMapper.mapToBookingDtoList(dbBookingService.findBookingsByCustomerName(customerName)));
     }
 
