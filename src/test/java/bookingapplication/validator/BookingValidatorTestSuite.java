@@ -1,9 +1,6 @@
 package bookingapplication.validator;
 
-import bookingapplication.domain.Booking;
-import bookingapplication.domain.Customer;
-import bookingapplication.domain.Facility;
-import bookingapplication.domain.Owner;
+import bookingapplication.domain.*;
 import bookingapplication.exception.BookingInThePastException;
 import bookingapplication.exception.FromDateEqualsToDateException;
 import bookingapplication.exception.OverlapsWithAnotherBookingException;
@@ -19,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,12 +66,40 @@ public class BookingValidatorTestSuite {
     }
 
     @Test
-    void shouldFetchValidBooking() throws Exception {
+    void shouldFetchValidBookingWhenUpdateBooking() throws Exception {
         //Given
-        when(dbBookingService.findBookings(booking.getFacility().getFacilityId())).thenReturn(new ArrayList<>());
+        List<Booking> bookingList = new ArrayList<>();
+        bookingList.add(booking);
+        when(dbBookingService.findBookings(booking.getFacility().getFacilityId())).thenReturn(bookingList);
 
         //When
-        Booking resultBooking = bookingValidator.validateBooking(booking);
+        Booking resultBooking = bookingValidator.validateBooking(booking, Method.PUT.getResource());
+
+        //Then
+        assertEquals(resultBooking, booking);
+    }
+
+    @Test
+    void shouldFetchValidBookingWhenCreateNewBooking() throws Exception {
+        //Given
+        List<Booking> bookingList = new ArrayList<>();
+        Booking booking2 = Booking.builder()
+                .bookingId(8L)
+                .fromDate(LocalDate.of(2022, 6, 16))
+                .toDate(LocalDate.of(2022,6, 18))
+                .price(BigDecimal.ZERO)
+                .facility(facility)
+                .customer(customer)
+                .owner(owner)
+                .build();
+
+        bookingList.add(booking);
+        bookingList.add(booking2);
+
+        when(dbBookingService.findBookings(booking.getFacility().getFacilityId())).thenReturn(bookingList);
+
+        //When
+        Booking resultBooking = bookingValidator.validateBooking(booking, Method.POST.getResource());
 
         //Then
         assertEquals(resultBooking, booking);

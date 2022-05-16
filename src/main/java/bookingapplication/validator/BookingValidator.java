@@ -1,6 +1,7 @@
 package bookingapplication.validator;
 
 import bookingapplication.domain.Booking;
+import bookingapplication.domain.Method;
 import bookingapplication.exception.BookingInThePastException;
 import bookingapplication.exception.FromDateEqualsToDateException;
 import bookingapplication.exception.OverlapsWithAnotherBookingException;
@@ -17,18 +18,33 @@ import java.util.List;
 public class BookingValidator {
     private final DbBookingService dbBookingService;
 
-    public Booking validateBooking(Booking booking) throws Exception {
+    public Booking validateBooking(Booking booking, String methodName) throws Exception {
         validateBookingDates(booking.getFromDate(), booking.getToDate());
         List<Booking> bookingForFacilityList = dbBookingService.findBookings(booking.getFacility().getFacilityId());
-        bookingForFacilityList.stream()
-                .filter(b -> !b.getBookingId().equals(booking.getBookingId()))
-                .forEach(o -> {
-                    try {
-                        bookingOverlaps(o, booking.getFromDate(), booking.getToDate());
-                    } catch (OverlapsWithAnotherBookingException e) {
-                        e.printStackTrace();
-                    }
-                });
+
+        switch (methodName) {
+            case "PUT":
+                bookingForFacilityList.stream()
+                        .filter(b -> !b.getBookingId().equals(booking.getBookingId()))
+                        .forEach(o -> {
+                            try {
+                                bookingOverlaps(o, booking.getFromDate(), booking.getToDate());
+                            } catch (OverlapsWithAnotherBookingException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                break;
+
+            case "POST":
+                bookingForFacilityList.forEach(o -> {
+                            try {
+                                bookingOverlaps(o, booking.getFromDate(), booking.getToDate());
+                            } catch (OverlapsWithAnotherBookingException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                break;
+        }
 
         return booking;
     }

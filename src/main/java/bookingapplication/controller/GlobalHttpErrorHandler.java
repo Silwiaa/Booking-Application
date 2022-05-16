@@ -24,6 +24,11 @@ public class GlobalHttpErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>("Customer with given id doesn't exist or can't be found", HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(CustomerNotFoundByNameException.class)
+    public ResponseEntity<Object> handleCustomerNotFoundByNameException(CustomerNotFoundByNameException customerNotFoundByNameException) {
+        return new ResponseEntity<>("Customer with given name doesn't exist or can't be found", HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(FacilityNotFoundException.class)
     public ResponseEntity<Object> handleFacilityNotFoundException(FacilityNotFoundException facilityNotFoundException) {
         return new ResponseEntity<>("Facility with given id doesn't exist or can't be found", HttpStatus.NOT_FOUND);
@@ -46,5 +51,10 @@ public class GlobalHttpErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(FromDateEqualsToDateException.class)
     public ResponseEntity<Object> handleFromDateEqualsToDateException(FromDateEqualsToDateException fromDateEqualsToDateException) {
         return new ResponseEntity<>("Make at least one day reservation", HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(ToDateBeforeFromDateException.class)
+    public ResponseEntity<Object> handleToDateBeforeFromDateException(ToDateBeforeFromDateException toDateBeforeFromDateException) {
+        return new ResponseEntity<>("To date before from date", HttpStatus.NOT_ACCEPTABLE);
     }
 }

@@ -2,6 +2,8 @@ package bookingapplication.controller;
 
 import bookingapplication.domain.Booking;
 import bookingapplication.domain.BookingDto;
+import bookingapplication.domain.Method;
+import bookingapplication.exception.CustomerNotFoundByNameException;
 import bookingapplication.mapper.BookingMapper;
 import bookingapplication.parser.DateParser;
 import bookingapplication.service.DbBookingService;
@@ -25,7 +27,7 @@ public class BookingController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/createBooking")
     public ResponseEntity<Void> createBooking(@RequestBody BookingDto bookingDto) throws Exception {
-        Booking booking = bookingValidator.validateBooking(bookingMapper.mapToBooking(bookingDto));
+        Booking booking = bookingValidator.validateBooking(bookingMapper.mapToBooking(bookingDto), Method.POST.getResource());
         dbBookingService.saveBooking(booking);
         return ResponseEntity.ok().build();
     }
@@ -35,13 +37,13 @@ public class BookingController {
             @RequestParam Long bookingId, @RequestParam String dateFrom, @RequestParam String dateTo
     ) throws Exception {
         Booking booking = bookingValidator.validateBooking(dbBookingService.updateBooking(
-                bookingId, dateParser.parseDate(dateFrom), dateParser.parseDate(dateTo)));
+                bookingId, dateParser.parseDate(dateFrom), dateParser.parseDate(dateTo)), Method.PUT.getResource());
         dbBookingService.saveBooking(booking);
         return ResponseEntity.ok(bookingMapper.mapToBookingDto(booking));
     }
 
     @GetMapping("/getCustomerBookings")
-    public ResponseEntity<List<BookingDto>> getCustomerBookings(@RequestParam String customerName) {
+    public ResponseEntity<List<BookingDto>> getCustomerBookings(@RequestParam String customerName) throws CustomerNotFoundByNameException {
         return ResponseEntity.ok(bookingMapper.mapToBookingDtoList(dbBookingService.findBookingsByCustomerName(customerName)));
     }
 

@@ -74,7 +74,7 @@ public class BookingControllerTestSuite {
                 .customer(customer)
                 .build();
 
-        when(bookingValidator.validateBooking(booking)).thenReturn(booking);
+        when(bookingValidator.validateBooking(booking, Method.POST.getResource())).thenReturn(booking);
         when(bookingMapper.mapToBooking(bookingDto)).thenReturn(booking);
         when(dbBookingService.saveBooking(booking)).thenReturn(booking);
 

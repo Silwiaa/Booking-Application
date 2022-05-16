@@ -2,6 +2,8 @@ package bookingapplication.service;
 
 import bookingapplication.domain.Booking;
 import bookingapplication.exception.BookingNotFoundException;
+import bookingapplication.exception.CustomerNotFoundByNameException;
+import bookingapplication.exception.FacilityNotFoundException;
 import bookingapplication.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbBookingService {
     private final BookingRepository bookingRepository;
+    private final DbFacilityService dbFacilityService;
+    private final DbCustomerService customerService;
 
     public Booking saveBooking(Booking booking) {
         booking.setPrice(countPrice(booking.getFromDate(),booking.getToDate(), booking.getFacility().getPrice()));
@@ -33,11 +37,13 @@ public class DbBookingService {
         return booking;
     }
 
-    public List<Booking> findBookingsByCustomerName(String customerName) {
+    public List<Booking> findBookingsByCustomerName(String customerName) throws CustomerNotFoundByNameException {
+        customerService.findCustomerByName(customerName);
         return bookingRepository.findBookingsByCustomerName(customerName);
     }
 
-    public List<Booking> findBookings(Long facilityId) {
+    public List<Booking> findBookings(Long facilityId) throws FacilityNotFoundException {
+        dbFacilityService.findFacilityById(facilityId);
         return bookingRepository.findBookingsByFacility_FacilityId(facilityId);
     }
 
