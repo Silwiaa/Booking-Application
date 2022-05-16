@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,6 +18,7 @@ public class BookingValidator {
     private final DbBookingService dbBookingService;
 
     public Booking validateBooking(Booking booking) throws Exception {
+        validateBookingDates(booking.getFromDate(), booking.getToDate());
         List<Booking> bookingForFacilityList = dbBookingService.findBookings(booking.getFacility().getFacilityId());
         List<Boolean> overlappingList = bookingForFacilityList.stream()
                 .filter(b -> !b.getBookingId().equals(booking.getBookingId()))
@@ -30,6 +30,12 @@ public class BookingValidator {
             LOGGER.info("Booking for >>" + booking.getFacility().getName() + "<< not available in given dates");
             throw new Exception();
         }
+    }
+
+    public void validateBookingDates(LocalDate dateFrom, LocalDate dateTo) throws Exception {
+        if (LocalDate.now().isAfter(dateFrom)) throw new Exception();
+        if(dateTo.isBefore(dateFrom)) throw new Exception();
+        if(dateTo.isEqual(dateFrom)) throw new Exception();
     }
 
     public boolean bookingOverlaps(Booking booking, LocalDate fromDate, LocalDate toDate) {
