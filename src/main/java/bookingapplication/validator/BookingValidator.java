@@ -33,9 +33,18 @@ public class BookingValidator {
     }
 
     public void validateBookingDates(LocalDate dateFrom, LocalDate dateTo) throws Exception {
-        if (LocalDate.now().isAfter(dateFrom)) throw new Exception();
-        if(dateTo.isBefore(dateFrom)) throw new Exception();
-        if(dateTo.isEqual(dateFrom)) throw new Exception();
+        if (LocalDate.now().isAfter(dateFrom)) {
+            LOGGER.error("Can not make booking in the past");
+            throw new Exception();
+        }
+        if(dateTo.isBefore(dateFrom)) {
+            LOGGER.error("To date can not be before from date");
+            throw new Exception();
+        }
+        if(dateTo.isEqual(dateFrom)) {
+            LOGGER.error("To date can not be equal to from date");
+            throw new Exception();
+        }
     }
 
     public boolean bookingOverlaps(Booking booking, LocalDate fromDate, LocalDate toDate) {

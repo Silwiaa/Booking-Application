@@ -116,4 +116,58 @@ public class BookingValidatorTestSuite {
         assertTrue(result3);
         assertTrue(result4);
     }
+
+    @Test
+    void shouldThrowExceptionIfFromDateInThePast() {
+        //Given
+        LocalDate fromDate = LocalDate.of(2021, 6, 10);
+        LocalDate toDate = LocalDate.of(2021, 6, 12);
+
+        //When
+        String errMesage = "";
+        try {
+            bookingValidator.validateBookingDates(fromDate, toDate);
+        } catch (Exception e) {
+            errMesage = e.getMessage();
+        }
+
+        //Then
+        assertEquals(errMesage, null);
+    }
+
+    @Test
+    void shouldThrowExceptionIfToDateBeforeFromDate() {
+        //Given
+        LocalDate fromDate = LocalDate.of(2022, 12, 10);
+        LocalDate toDate = LocalDate.of(2022, 12, 9);
+
+        //When
+        String errMesage = "";
+        try {
+            bookingValidator.validateBookingDates(fromDate, toDate);
+        } catch (Exception e) {
+            errMesage = e.getMessage();
+        }
+
+        //Then
+        assertEquals(errMesage, null);
+    }
+
+    @Test
+    void shouldThrowExceptionIfToDateEqualsFromDate() {
+        //Given
+        LocalDate fromDate = LocalDate.of(2022, 12, 10);
+        LocalDate toDate = LocalDate.of(2022, 12, 10);
+
+        //When
+        String errMesage = "";
+        try {
+            bookingValidator.validateBookingDates(fromDate, toDate);
+        } catch (Exception e) {
+            errMesage = e.getMessage();
+        }
+
+        //Then
+        assertEquals(errMesage, null);
+    }
 }
